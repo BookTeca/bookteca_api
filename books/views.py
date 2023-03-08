@@ -17,6 +17,7 @@ class BookView(generics.ListCreateAPIView):
     #         is_active = True
     #     )
 
+
 class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = Book.objects.all()
