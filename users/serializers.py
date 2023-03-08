@@ -28,7 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "password",
             "first_name",
-            "is_superuser"
+            "is_superuser",
             "is_blocked",
         ]
         extra_kwargs = {
