@@ -33,9 +33,11 @@ class BookFollowing(models.Model):
         on_delete=models.CASCADE,
         related_name="book_following"
     )
+    book_title = models.CharField(max_length=255)
 
     user = models.ForeignKey(
         "users.User",
         on_delete=models.CASCADE,
         related_name="user_book_following"
     )
+    user_email = models.EmailField(max_length=200)

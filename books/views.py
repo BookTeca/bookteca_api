@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import Book, BookFollowing
 from .serializers import BookSerializer, BookFollowingSerializer
 
@@ -38,14 +38,25 @@ class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class BookFollowingView(generics.ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     
     queryset = BookFollowing.objects.all()
     serializer_class = BookFollowingSerializer
 
     lookup_url_kwarg = "book_id"
 
+    def get_queryset(self):
+        self.check_object_permissions(self.request, self.request.user)
+        if self.request.user.is_superuser:
+            return BookFollowing.objects.all()
+
+        return BookFollowing.objects.filter(
+            user_email=self.request.user.email
+        )
+
     def perform_create(self, serializer):
         book = Book.objects.get(id=self.kwargs.get("book_id"))
         print(book)
-        return serializer.save(user=self.request.user, book=book)
+        title = book.title
+        email = self.request.user.email
+        return serializer.save(user=self.request.user, book=book, book_title=title, user_email=email)

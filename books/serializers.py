@@ -38,10 +38,14 @@ class BookFollowingSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "book",
-            "user"
+            "book_title",
+            "user",
+            "user_email"
         ]
 
         extra_kwargs = {
             "book": {"read_only": True},
-            "user": {"read_only": True}
+            "book_title": {"read_only": True},
+            "user": {"read_only": True},
+            "user_email": {"read_only": True}
         }
