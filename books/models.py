@@ -21,4 +21,21 @@ class Book(models.Model):
     quantity = models.IntegerField()
     is_active = models.BooleanField(default=True)
 
+    following = models.ManyToManyField(
+        "users.User",
+        through="books.BookFollowing",
+        related_name="following_books"
+    )
 
+class BookFollowing(models.Model):
+    book = models.ForeignKey(
+        "books.Book",
+        on_delete=models.CASCADE,
+        related_name="book_following"
+    )
+
+    user = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="user_book_following"
+    )

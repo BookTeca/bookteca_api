@@ -1,23 +1,31 @@
 from django.shortcuts import render
 from rest_framework import generics
-from .models import Book
-from .serializers import BookSerializer
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .models import Book, BookFollowing
+from .serializers import BookSerializer, BookFollowingSerializer
 
 
 class BookView(generics.ListCreateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
-    # def get_queryset(self):
-    #     if self.request.user.is_seperuser:
-    #         return Book.objects.all()
+    def get_queryset(self):
 
-    #     return Book.objects.filter(
-    #         is_active = True
-    #     )
+        self.check_object_permissions(self.request, self.request.user)
+        if self.request.user.is_superuser:
+            return Book.objects.all()
+
+        return Book.objects.filter(
+            is_active = True
+        )
 
 class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     queryset = Book.objects.all()
     serializer_class = BookSerializer
@@ -27,3 +35,17 @@ class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, instance):
         instance.is_active = False
         instance.save()
+
+class BookFollowingView(generics.ListCreateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
+    queryset = BookFollowing.objects.all()
+    serializer_class = BookFollowingSerializer
+
+    lookup_url_kwarg = "book_id"
+
+    def perform_create(self, serializer):
+        book = Book.objects.get(id=self.kwargs.get("book_id"))
+        print(book)
+        return serializer.save(user=self.request.user, book=book)
