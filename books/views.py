@@ -2,13 +2,15 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+
+from users.permission import IsUserOwner
 from .models import Book, BookFollowing
 from .serializers import BookSerializer, BookFollowingSerializer
 
 
 class BookView(generics.ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly,IsUserOwner]
 
     queryset = Book.objects.all()
     serializer_class = BookSerializer
@@ -25,7 +27,7 @@ class BookView(generics.ListCreateAPIView):
 
 class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly,IsUserOwner]
 
     queryset = Book.objects.all()
     serializer_class = BookSerializer
@@ -38,7 +40,7 @@ class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class BookFollowingView(generics.ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,IsUserOwner]
     
     queryset = BookFollowing.objects.all()
     serializer_class = BookFollowingSerializer
