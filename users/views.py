@@ -34,3 +34,4 @@ class UserDetailView(DestroyAPIView, UpdateAPIView):
     def perform_destroy(self, instance):
         instance.is_active = False
         instance.save()
+

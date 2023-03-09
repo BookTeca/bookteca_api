@@ -18,7 +18,4 @@ class User(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
 
-    Following = models.ManyToManyField(
-        "books.Book",
-        related_name="user_book"
-    )
+

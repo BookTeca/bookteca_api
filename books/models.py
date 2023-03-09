@@ -23,3 +23,26 @@ class Book(models.Model):
     )
     quantity = models.IntegerField()
     is_active = models.BooleanField(default=True)
+
+
+    following = models.ManyToManyField(
+        "users.User",
+        through="books.BookFollowing",
+        related_name="following_books"
+    )
+
+class BookFollowing(models.Model):
+    book = models.ForeignKey(
+        "books.Book",
+        on_delete=models.CASCADE,
+        related_name="book_following"
+    )
+    book_title = models.CharField(max_length=255)
+
+    user = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="user_book_following"
+    )
+    user_email = models.EmailField(max_length=200)
+
