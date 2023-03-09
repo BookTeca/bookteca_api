@@ -43,4 +43,7 @@ class UserSerializer(serializers.ModelSerializer):
                 ],
             },
         }
+
         read_only_fields = ["is_superuser", "is_blocked", "is_active"]
+
+
