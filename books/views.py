@@ -1,15 +1,15 @@
 from django.shortcuts import render
 from rest_framework import generics
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from users.permission import IsUserOwner
+from books.permissions import IsOwnerOrColaboratorOrReadyOnly
+from copies.models import Copy
 from .models import Book, BookFollowing
 from .serializers import BookSerializer, BookFollowingSerializer
 
 
 class BookView(generics.ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly,IsUserOwner]
+    permission_classes = [IsOwnerOrColaboratorOrReadyOnly]
 
     queryset = Book.objects.all()
     serializer_class = BookSerializer
@@ -27,20 +27,27 @@ class BookView(generics.ListCreateAPIView):
 
 class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly,IsUserOwner]
+    permission_classes = [IsOwnerOrColaboratorOrReadyOnly]
 
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
     lookup_url_kwarg = "book_id"
+    
 
     def perform_destroy(self, instance):
+        copies_obj = Copy.objects.filter(book_id=self.kwargs.get("book_id"))
+
+        for copie in copies_obj:
+            copie.is_available = False
+            copie.save()
+        
         instance.is_active = False
         instance.save()
 
 class BookFollowingView(generics.ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated,IsUserOwner]
+    permission_classes = [IsOwnerOrColaboratorOrReadyOnly]
     
     queryset = BookFollowing.objects.all()
     serializer_class = BookFollowingSerializer
@@ -58,7 +65,6 @@ class BookFollowingView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         book = Book.objects.get(id=self.kwargs.get("book_id"))
-        print(book)
         title = book.title
         email = self.request.user.email
         return serializer.save(user=self.request.user, book=book, book_title=title, user_email=email)

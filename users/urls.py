@@ -8,4 +8,5 @@ urlpatterns = [
     path("users/<int:user_id>/", UserDetailView.as_view()),
     path("login/", TokenObtainPairView.as_view()),
     path("refresh/", TokenRefreshView.as_view()),
+]
 
