@@ -40,14 +40,16 @@ class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):
         book = Book.objects.get(pk=self.kwargs.get("book_id"))
-        send_mail(
-            f"Modificação no livro {book.title}",
-            f"Modificação no livro seguido: {self.request.data}",
-            None,
-            [self.request.user.email],
-            fail_silently=False
+        following = Following.objects.filter(book=book)
 
-        )
+        for follow in following:
+            send_mail(
+                f"Modificação no livro {book.title}",
+                f"Modificação no livro seguido: {self.request.data}",
+                None,
+                [follow.user.email],
+                fail_silently=False
+            )
         serializer.save()
     
 
