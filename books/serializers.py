@@ -1,6 +1,6 @@
 from copies.models import Copy
 from rest_framework import serializers
-from .models import Book, BookFollowing
+from .models import Book, Following
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -33,9 +33,9 @@ class BookSerializer(serializers.ModelSerializer):
 
         return book_obj
     
-class BookFollowingSerializer(serializers.ModelSerializer):
+class FollowingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = BookFollowing
+        model = Following
         fields = [
             "id",
             "book",

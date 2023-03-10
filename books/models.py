@@ -27,11 +27,11 @@ class Book(models.Model):
 
     following = models.ManyToManyField(
         "users.User",
-        through="books.BookFollowing",
+        through="books.Following",
         related_name="following_books"
     )
 
-class BookFollowing(models.Model):
+class Following(models.Model):
     book = models.ForeignKey(
         "books.Book",
         on_delete=models.CASCADE,
