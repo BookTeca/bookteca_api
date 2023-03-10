@@ -3,6 +3,7 @@ from rest_framework import generics
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from books.permissions import IsColaboratorOrReadyOnly, IsOwnerOrColaboratorOrReadyOnly
 from copies.models import Copy
+from users.models import User
 from .models import Book, Following
 from .serializers import BookSerializer, FollowingSerializer
 from django.core.mail import send_mail
@@ -73,11 +74,10 @@ class BookFollowingView(generics.ListCreateAPIView):
             return Following.objects.all()
 
         return Following.objects.filter(
-            user_email=self.request.user.email
+            user=self.request.user
         )
 
     def perform_create(self, serializer):
         book = Book.objects.get(id=self.kwargs.get("book_id"))
-        title = book.title
-        email = self.request.user.email
-        return serializer.save(user=self.request.user, book=book, book_title=title, user_email=email)
+        user = User.objects.get(id=self.request.user.id)
+        return serializer.save(user=user, book=book)
