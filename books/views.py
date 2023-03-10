@@ -2,7 +2,6 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-
 from users.permission import IsUserOwner
 from .models import Book, BookFollowing
 from .serializers import BookSerializer, BookFollowingSerializer
