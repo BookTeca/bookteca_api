@@ -25,12 +25,6 @@ class Book(models.Model):
     is_active = models.BooleanField(default=True)
 
 
-    # following = models.ManyToManyField(
-    #     "users.User",
-    #     through="books.Following",
-    #     related_name="following_books"
-    # )
-
 class Following(models.Model):
     book = models.ForeignKey(
         "books.Book",
