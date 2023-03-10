@@ -24,6 +24,7 @@ class BookView(generics.ListCreateAPIView):
             is_active = True
         )
 
+
 class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly,IsUserOwner]
