@@ -19,27 +19,34 @@ class Copy(models.Model):
         on_delete=models.CASCADE,
         related_name="book_copies",
     )
-    borrowings = models.ManyToManyField(
+
+    users = models.ManyToManyField(
         "users.User",
-        through="copies.Borrowings",
-        related_name="borrowings_copy",
+        through="copies.Loan",
+        related_name="borroweds_copies",
     )
 
+    def __repr__(self):
+        return f"<Copy [{self.id}] - Book [{self.book.id}]>"
 
-class Borrowings(models.Model):
+
+class Loan(models.Model):
     class Meta:
         ordering = ["id"]
 
-    borrowing_date = models.DateField(auto_now_add=True)
-    estimated_return_date = models.DateField()
+    loan_date = models.DateField(auto_now_add=True)
+    estimated_return_date = models.DateField(null=True, default=None)
     return_date = models.DateField(null=True, default=None)
     copy = models.ForeignKey(
         "copies.Copy",
         on_delete=models.CASCADE,
-        related_name="copy_borrowings"
+        related_name="loans"
     )
     user = models.ForeignKey(
         "users.User",
         on_delete=models.CASCADE,
-        related_name="user_copy_borrowings"
+        related_name="borrowings_copies"
     )
+
+    def __repr__(self):
+        return f"<Loan [{self.id}]: User [{self.user.id}] - Copy [{self.copy.id}]>"

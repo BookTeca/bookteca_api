@@ -35,6 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "is_superuser",
             "is_blocked",
+            "blocked_until",
             "is_active"
         ]
         extra_kwargs = {
