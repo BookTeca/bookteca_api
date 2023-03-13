@@ -12,10 +12,11 @@ class User(AbstractUser):
     is_blocked = models.BooleanField(default=False)
     email = models.EmailField(
         max_length=200,
-        unique=True
+        unique=True,
+        error_messages={
+            "unique": ("A user with that email already exists."),
+        }
     )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
-
-

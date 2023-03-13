@@ -15,6 +15,7 @@ class BookSerializer(serializers.ModelSerializer):
         Copy.objects.bulk_create(copy_obj)
 
         return book_obj
+    
     class Meta:
         model = Book
         fields = [

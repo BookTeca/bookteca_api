@@ -5,6 +5,11 @@ from .models import User
 
 class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data: dict) -> User:
+        super_user = validated_data.pop("is_superuser", None)
+
+        if super_user is True:
+            return User.objects.create_superuser(**validated_data)
+
         return User.objects.create_user(**validated_data)
 
     def update(self, instance: User, validated_data: dict) -> User:
@@ -33,17 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
             "is_active"
         ]
         extra_kwargs = {
-            "password": {"write_only": True},
-            "email": {
-                "validators": [
-                    UniqueValidator(
-                        queryset=User.objects.all(),
-                        message="email already exists"
-                    )
-                ],
-            },
+            "password": {"write_only": True}
         }
 
-        read_only_fields = ["is_superuser", "is_blocked", "is_active"]
-
-
+        read_only_fields = ["is_blocked", "is_active"]

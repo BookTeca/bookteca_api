@@ -17,7 +17,6 @@ class CopySerializer(serializers.ModelSerializer):
 class BorrowingsSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: dict) -> Borrowings:
-        ipdb.set_trace()
         copy_id = self.data.pop("copy_id", None)
         user_id = self.data.pop("user_id", None)
         obj_copy = get_object_or_404(Copy, pk=copy_id)
