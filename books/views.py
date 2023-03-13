@@ -23,10 +23,8 @@ class BookView(generics.ListCreateAPIView):
             return Book.objects.all()
 
         return Book.objects.filter(
-            is_active = True
+            is_active=True
         )
-    
-    
 
 
 class BookDetailView(generics.RetrieveUpdateDestroyAPIView):

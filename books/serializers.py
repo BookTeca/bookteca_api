@@ -15,7 +15,7 @@ class BookSerializer(serializers.ModelSerializer):
         Copy.objects.bulk_create(copy_obj)
 
         return book_obj
-    
+
     class Meta:
         model = Book
         fields = [
@@ -28,10 +28,11 @@ class BookSerializer(serializers.ModelSerializer):
             "quantity",
             "is_active"
         ]
-  
-    
+
+
 class FollowingSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only= True)
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = Following
         fields = [
