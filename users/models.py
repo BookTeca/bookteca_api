@@ -10,12 +10,14 @@ class User(AbstractUser):
         unique_together = ["username", "email"]
 
     is_blocked = models.BooleanField(default=False)
+    blocked_until = models.DateField(null=True, default=None)
     email = models.EmailField(
         max_length=200,
-        unique=True
+        unique=True,
+        error_messages={
+            "unique": ("A user with that email already exists."),
+        }
     )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
-
-
