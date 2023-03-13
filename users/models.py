@@ -10,6 +10,7 @@ class User(AbstractUser):
         unique_together = ["username", "email"]
 
     is_blocked = models.BooleanField(default=False)
+    blocked_until = models.DateField(null=True, default=None)
     email = models.EmailField(
         max_length=200,
         unique=True,
@@ -20,3 +21,6 @@ class User(AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
+
+    def __repr__(self):
+        return f"<User [{self.id}] - [{self.username}]>"
