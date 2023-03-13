@@ -21,3 +21,6 @@ class User(AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
+
+    def __repr__(self):
+        return f"<User [{self.id}] - [{self.username}]>"
