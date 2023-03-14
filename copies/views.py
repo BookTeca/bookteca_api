@@ -1,7 +1,8 @@
 from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView, UpdateAPIView, RetrieveDestroyAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsUserCollaborator, IsUserOwnerOrCollaborator
+from .permissions import IsUserCollaborator
+from users.permission import IsUserOwnerOrCollaborator
 from books.models import Book
 from .models import Copy, Loan
 from .serializers import CopySerializer, LoanSerializer
@@ -21,7 +22,8 @@ class CopyListView(ListAPIView):
 
     def get_queryset(self):
         obj_book = get_object_or_404(Book, pk=self.kwargs["book_id"])
-        return Copy.objects.filter(book=obj_book)
+        # Copy.objects.filter(book=obj_book)
+        return obj_book.book_copies.all()
 
 
 class CopyDetailView(RetrieveUpdateDestroyAPIView):
@@ -75,9 +77,10 @@ class LoanListView(ListAPIView):
 
     def get_queryset(self):
         obj_user = get_object_or_404(User, pk=self.kwargs["user_id"])
-
+        today = dt.now().date()
+        
         self.check_object_permissions(self.request, obj_user)
-
+        
         return Loan.objects.filter(user=obj_user).select_related('copy').select_related("user")
 
 
@@ -103,14 +106,3 @@ class LoanDetailView(RetrieveDestroyAPIView):
             instance.user.blocked_until = instance.return_date + td(days=1)
             instance.user.save()
             instance.save()
-
-
-class LaonUpdateView(UpdateAPIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, IsUserOwnerOrCollaborator]
-
-    serializer_class = LoanSerializer
-    
-    def update(self, request, *args, **kwargs):
-        
-        return ...

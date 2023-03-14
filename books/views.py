@@ -7,6 +7,7 @@ from users.models import User
 from .models import Book, Following
 from .serializers import BookSerializer, FollowingSerializer
 from django.core.mail import send_mail
+from django.conf import settings
 
 
 class BookView(generics.ListCreateAPIView):
@@ -38,6 +39,7 @@ class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):
         book = Book.objects.get(pk=self.kwargs.get("book_id"))
+        
         following = Following.objects.filter(book=book)
         list_email = []
         for follow in following:
@@ -46,12 +48,11 @@ class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
         send_mail(
             f"Modificação no livro {book.title}",
             f"Modificação no livro seguido: {self.request.data}",
-            None,
+            settings.EMAIL_HOST_USER,
             list_email,
             fail_silently=False
         )
         serializer.save()
-    
 
     def perform_destroy(self, instance):
         copies_obj = Copy.objects.filter(book_id=self.kwargs.get("book_id"))
@@ -62,6 +63,7 @@ class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
         
         instance.is_active = False
         instance.save()
+
 
 class BookFollowingView(generics.ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
