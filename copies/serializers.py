@@ -1,13 +1,8 @@
 from rest_framework import serializers
 from .models import Copy, Loan
-from books.models import Book
-import ipdb
-from django.shortcuts import get_object_or_404
-from users.models import User
 from datetime import datetime, timedelta
 from books.serializers import BookSerializer
 from users.serializers import UserSerializer
-from time import timezone
 
 
 class CopySerializer(serializers.ModelSerializer):
