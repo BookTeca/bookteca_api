@@ -33,6 +33,6 @@ def loan_job():
 def start():
     sched = BackgroundScheduler()
     sched.add_jobstore(DjangoJobStore(), "default")
-    sched.add_job(loan_job, trigger=CronTrigger(day_of_week="mon-fri", hour="8-16/2", minute="00", timezone=tz.UTC), jobstore="default", id="loan_job", replace_existing=True)
+    sched.add_job(loan_job, trigger=CronTrigger(day_of_week="mon-fri", hour="9-16/2", minute="30", timezone=tz.UTC), jobstore="default", id="loan_job", replace_existing=True)
     register_events(sched)
     # sched.start()
