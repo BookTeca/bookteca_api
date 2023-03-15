@@ -1,7 +1,8 @@
-from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView, UpdateAPIView, RetrieveDestroyAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView, RetrieveDestroyAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsUserCollaborator, IsUserOwnerOrCollaborator
+from .permissions import IsUserCollaborator
+from users.permission import IsUserOwnerOrCollaborator
 from books.models import Book
 from .models import Copy, Loan
 from .serializers import CopySerializer, LoanSerializer
@@ -21,10 +22,11 @@ class CopyListView(ListAPIView):
 
     def get_queryset(self):
         obj_book = get_object_or_404(Book, pk=self.kwargs["book_id"])
-        return Copy.objects.filter(book=obj_book)
+
+        return obj_book.book_copies.all()
 
 
-class CopyDetailView(RetrieveUpdateDestroyAPIView):
+class CopyDetailView(RetrieveDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsUserCollaborator]
 
@@ -34,11 +36,11 @@ class CopyDetailView(RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = "copy_id"
 
     def perform_destroy(self, instance: Copy):
-        if instance.state == "Danificado":
-            instance.is_available = False
-            instance.book["quantity"] -= 1
-            instance.book.save()
-            instance.save()
+        instance.state = "Danificado"
+        instance.is_available = False
+        instance.book.quantity -= 1
+        instance.book.save()
+        instance.save()
 
 
 class LoanCreateView(CreateAPIView):
@@ -58,8 +60,9 @@ class LoanCreateView(CreateAPIView):
         if not obj_book.quantity or not obj_book.is_active:
             return self.raise_uncaught_exception(exc=BookCopyNotAvailableException())
 
-        obj_copy_borrow = Copy.objects.filter(is_available=True, book=obj_book).first()
-        obj_exists_loan_copy = Loan.objects.filter(copy__book=obj_book, user=obj_user, return_date__isnull=True, estimated_return_date__gte=today).exists()
+        obj_copy_borrow = obj_book.book_copies.all().filter(is_available=True).first()
+        
+        obj_exists_loan_copy = obj_user.borrowings_copies.all().filter(copy__book=obj_book, return_date__isnull=True, estimated_return_date__gte=today).exists()
         
         if obj_exists_loan_copy:
             return self.raise_uncaught_exception(exc=LoanBookAlreadyExistsException())
@@ -73,11 +76,11 @@ class LoanListView(ListAPIView):
 
     serializer_class = LoanSerializer
 
-    def get_queryset(self):
+    def get_queryset(self):    
         obj_user = get_object_or_404(User, pk=self.kwargs["user_id"])
 
         self.check_object_permissions(self.request, obj_user)
-
+        
         return Loan.objects.filter(user=obj_user).select_related('copy').select_related("user")
 
 
@@ -92,6 +95,8 @@ class LoanDetailView(RetrieveDestroyAPIView):
     def perform_destroy(self, instance: Loan):
         instance.return_date = dt.now().date()
         instance.copy.is_available = True
+        instance.copy.book.quantity += 1
+        instance.copy.book.save()
 
         estimated_return_difference = instance.estimated_return_date - instance.loan_date
         current_return_difference = instance.estimated_return_date - instance.return_date
@@ -102,15 +107,5 @@ class LoanDetailView(RetrieveDestroyAPIView):
                 instance.user.blocked_until = instance.return_date + td(days=3)
             instance.user.blocked_until = instance.return_date + td(days=1)
             instance.user.save()
-            instance.save()
-
-
-class LaonUpdateView(UpdateAPIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, IsUserOwnerOrCollaborator]
-
-    serializer_class = LoanSerializer
-    
-    def update(self, request, *args, **kwargs):
-        
-        return ...
+            
+        instance.save()
