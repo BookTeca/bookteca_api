@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", False)
 
-ALLOWED_HOSTS = ["booktecaapi-production.up.railway.app", "0.0.0.0"]
+ALLOWED_HOSTS = ["booktecaapi-production.up.railway.app", "0.0.0.0", "127.0.0.1"]
 
 
 # Application definition
@@ -170,14 +170,14 @@ USE_TZ = True
 # Format string for displaying run time timestamps in the Django admin site. The default
 # just adds seconds to the standard Django format, which is useful for displaying the timestamps
 # for jobs that are scheduled to run on intervals of less than one minute.
-# 
+#
 # See https://docs.djangoproject.com/en/dev/ref/settings/#datetime-format for format string
 # syntax details.
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 
 # Maximum run time allowed for jobs that are triggered manually via the Django admin site, which
 # prevents admin site HTTP requests from timing out.
-# 
+#
 # Longer running jobs should probably be handed over to a background task processing library
 # that supports multiple background worker processes instead (e.g. Dramatiq, Celery, Django-RQ,
 # etc. See: https://djangopackages.org/grids/g/workers-queues-tasks/ for popular options).
