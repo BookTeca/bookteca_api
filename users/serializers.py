@@ -42,4 +42,4 @@ class UserSerializer(serializers.ModelSerializer):
             "password": {"write_only": True}
         }
 
-        read_only_fields = ["is_blocked", "is_active"]
+        read_only_fields = ["is_blocked", "blocked_until", "is_active"]
