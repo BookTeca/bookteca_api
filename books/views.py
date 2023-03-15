@@ -7,6 +7,7 @@ from .models import Book, Following
 from .serializers import BookSerializer, FollowingSerializer
 from django.core.mail import send_mail
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 
 
 class BookView(generics.ListCreateAPIView):
@@ -83,6 +84,6 @@ class BookFollowingView(generics.ListCreateAPIView):
         )
 
     def perform_create(self, serializer):
-        book = Book.objects.get(id=self.kwargs.get("book_id"))
-        user = User.objects.get(id=self.request.user.id)
+        book = get_object_or_404(Book, id=self.kwargs.get("book_id"))
+        user = get_object_or_404(User, id=self.request.user.id)
         return serializer.save(user=user, book=book)

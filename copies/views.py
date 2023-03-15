@@ -1,4 +1,4 @@
-from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView, RetrieveDestroyAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveDestroyAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsUserCollaborator
@@ -7,7 +7,6 @@ from books.models import Book
 from .models import Copy, Loan
 from .serializers import CopySerializer, LoanSerializer
 from django.shortcuts import get_object_or_404
-import ipdb
 from users.models import User
 from datetime import datetime as dt, timedelta as td
 from .api_exceptions import UserBlockedException, BookCopyNotAvailableException, LoanBookAlreadyExistsException
